@@ -189,14 +189,15 @@ extern "C" {
     WHISPER_API whisper_token whisper_token_eot (struct whisper_context * ctx);
     WHISPER_API whisper_token whisper_token_sot (struct whisper_context * ctx);
     WHISPER_API whisper_token whisper_token_prev(struct whisper_context * ctx);
+    WHISPER_API whisper_token whisper_token_nosp(struct whisper_context * ctx);
     WHISPER_API whisper_token whisper_token_solm(struct whisper_context * ctx);
     WHISPER_API whisper_token whisper_token_not (struct whisper_context * ctx);
     WHISPER_API whisper_token whisper_token_beg (struct whisper_context * ctx);
     WHISPER_API whisper_token whisper_token_lang(struct whisper_context * ctx, int lang_id);
 
     // Task tokens
-    WHISPER_API whisper_token whisper_token_translate (void);
-    WHISPER_API whisper_token whisper_token_transcribe(void);
+    WHISPER_API whisper_token whisper_token_translate (struct whisper_context * ctx);
+    WHISPER_API whisper_token whisper_token_transcribe(struct whisper_context * ctx);
 
     // Performance information
     WHISPER_API void whisper_print_timings(struct whisper_context * ctx);

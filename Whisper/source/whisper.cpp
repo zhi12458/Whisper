@@ -208,16 +208,20 @@ struct whisper_vocab {
     id token_eot  = 50256;
     id token_sot  = 50257;
     id token_prev = 50360;
-    id token_solm = 50361; // ??
+    id token_nosp = 50361; // no-speech probability token
+    id token_solm = 50359; // sentence start
     id token_not  = 50362; // no timestamps
     id token_beg  = 50363;
 
     // available tasks
-    static const id token_translate  = 50358;
-    static const id token_transcribe = 50359;
+    id token_translate  = 50357;
+    id token_transcribe = 50358;
 
     bool is_multilingual() const {
-        return n_vocab == 51865;
+        return n_vocab >= 51865;
+    }
+    int num_languages() const {
+        return n_vocab - 51765 - (is_multilingual() ? 1 : 0);
     }
 };
 
@@ -576,10 +580,16 @@ static bool whisper_model_load(const std::string & fname, whisper_context & wctx
         if (vocab.is_multilingual()) {
             vocab.token_eot++;
             vocab.token_sot++;
-            vocab.token_prev++;
-            vocab.token_solm++;
-            vocab.token_not++;
-            vocab.token_beg++;
+
+            const int dt = vocab.num_languages() - 98;
+
+            vocab.token_translate  += dt;
+            vocab.token_transcribe += dt;
+            vocab.token_solm       += dt;
+            vocab.token_prev       += dt;
+            vocab.token_nosp       += dt;
+            vocab.token_not        += dt;
+            vocab.token_beg        += dt;
         }
 
         if (n_vocab < model.hparams.n_vocab) {
@@ -591,8 +601,16 @@ static bool whisper_model_load(const std::string & fname, whisper_context & wctx
                     word = "[_EOT_]";
                 } else if (i == vocab.token_sot) {
                     word = "[_SOT_]";
+                } else if (i == vocab.token_translate) {
+                    word = "[_TRANSLATE_]";
+                } else if (i == vocab.token_transcribe) {
+                    word = "[_TRANSCRIBE_]";
+                } else if (i == vocab.token_solm) {
+                    word = "[_SOLM_]";
                 } else if (i == vocab.token_prev) {
                     word = "[_PREV_]";
+                } else if (i == vocab.token_nosp) {
+                    word = "[_NOSP_]";
                 } else if (i == vocab.token_not) {
                     word = "[_NOT_]";
                 } else if (i == vocab.token_beg) {
@@ -2530,6 +2548,10 @@ whisper_token whisper_token_prev(struct whisper_context * ctx) {
     return ctx->vocab.token_prev;
 }
 
+whisper_token whisper_token_nosp(struct whisper_context * ctx) {
+    return ctx->vocab.token_nosp;
+}
+
 whisper_token whisper_token_solm(struct whisper_context * ctx) {
     return ctx->vocab.token_solm;
 }
@@ -2546,12 +2568,12 @@ whisper_token whisper_token_lang(struct whisper_context * ctx, int lang_id) {
     return whisper_token_sot(ctx) + 1 + lang_id;
 }
 
-whisper_token whisper_token_translate(void) {
-    return whisper_vocab::token_translate;
+whisper_token whisper_token_translate(struct whisper_context * ctx) {
+    return ctx->vocab.token_translate;
 }
 
-whisper_token whisper_token_transcribe(void) {
-    return whisper_vocab::token_transcribe;
+whisper_token whisper_token_transcribe(struct whisper_context * ctx) {
+    return ctx->vocab.token_transcribe;
 }
 
 void whisper_print_timings(struct whisper_context * ctx) {
@@ -2841,9 +2863,9 @@ int whisper_full(
         const int lang_id = whisper_lang_id(params.language);
         prompt_init.push_back(whisper_token_lang(ctx, lang_id));
         if (params.translate) {
-            prompt_init.push_back(whisper_token_translate());
+            prompt_init.push_back(whisper_token_translate(ctx));
         } else {
-            prompt_init.push_back(whisper_token_transcribe());
+            prompt_init.push_back(whisper_token_transcribe(ctx));
         }
     }
 

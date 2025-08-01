@@ -82,11 +82,12 @@ namespace Whisper
 			rdi.PreviousWord = whisper_token_prev( &ctx );
 			rdi.SentenceStart = whisper_token_solm( &ctx );
 			rdi.Not = whisper_token_not( &ctx );
-			rdi.TranscriptionBegin = whisper_token_beg( &ctx );
-			rdi.TaskTranslate = whisper_token_translate();
-			rdi.TaskTranscribe = whisper_token_transcribe();
-			return S_OK;
-		}
+                       rdi.TranscriptionBegin = whisper_token_beg( &ctx );
+                       rdi.NoSpeech = whisper_token_nosp( &ctx );
+                       rdi.TaskTranslate = whisper_token_translate( &ctx );
+                       rdi.TaskTranscribe = whisper_token_transcribe( &ctx );
+                       return S_OK;
+               }
 		HRESULT COMLIGHTCALL tokenize( const char* text, pfnDecodedTokens pfn, void* pv ) override final
 		{
 			const auto res = ::tokenize( ctx.vocab, text );
@@ -348,15 +349,21 @@ namespace Whisper
 			}
 
 			vocab.n_vocab = model.hparams.n_vocab;
-			if( vocab.is_multilingual() )
-			{
-				vocab.token_eot++;
-				vocab.token_sot++;
-				vocab.token_prev++;
-				vocab.token_solm++;
-				vocab.token_not++;
-				vocab.token_beg++;
-			}
+                        if( vocab.is_multilingual() )
+                        {
+                                vocab.token_eot++;
+                                vocab.token_sot++;
+
+                                int dt = vocab.num_languages() - 98;
+
+                                vocab.token_translate  += dt;
+                                vocab.token_transcribe += dt;
+                                vocab.token_solm       += dt;
+                                vocab.token_prev       += dt;
+                                vocab.token_nosp       += dt;
+                                vocab.token_not        += dt;
+                                vocab.token_beg        += dt;
+                        }
 
 			if( n_vocab < model.hparams.n_vocab )
 			{
@@ -369,14 +376,22 @@ namespace Whisper
 						word = "[_EOT_]";
 					else if( i == vocab.token_sot )
 						word = "[_SOT_]";
-					else if( i == vocab.token_prev )
-						word = "[_PREV_]";
-					else if( i == vocab.token_not )
-						word = "[_NOT_]";
-					else if( i == vocab.token_beg )
-						word = "[_BEG_]";
-					else
-						word = "[_extra_token_" + std::to_string( i ) + "]";
+                                        else if( i == vocab.token_translate )
+                                                word = "[_TRANSLATE_]";
+                                        else if( i == vocab.token_transcribe )
+                                                word = "[_TRANSCRIBE_]";
+                                        else if( i == vocab.token_solm )
+                                                word = "[_SOLM_]";
+                                        else if( i == vocab.token_prev )
+                                                word = "[_PREV_]";
+                                        else if( i == vocab.token_nosp )
+                                                word = "[_NOSP_]";
+                                        else if( i == vocab.token_not )
+                                                word = "[_NOT_]";
+                                        else if( i == vocab.token_beg )
+                                                word = "[_BEG_]";
+                                        else
+                                                word = "[_extra_token_" + std::to_string( i ) + "]";
 
 					vocab.token_to_id[ word ] = i;
 					vocab.id_to_token[ i ] = word;

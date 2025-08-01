@@ -12,10 +12,12 @@ namespace Whisper
 		int PreviousWord;   // token_prev
 		// Start of a sentence
 		int SentenceStart;   // token_solm
-		//Represents the word "not" in the transcription
-		int Not;    // token_not
-		//New transcription
-		int TranscriptionBegin;    // token_beg
+               //Represents the word "not" in the transcription
+               int Not;    // token_not
+               // No-speech probability token
+               int NoSpeech;    // token_nosp
+               //New transcription
+               int TranscriptionBegin;    // token_beg
 
 		// token_translate
 		int TaskTranslate;

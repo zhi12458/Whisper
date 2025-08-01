@@ -202,7 +202,9 @@ namespace Whisper
 		Welsh = 0x7963,  // "cy"
 		/// <summary>Yiddish</summary>
 		Yiddish = 0x6979,  // "yi"
-		/// <summary>Yoruba</summary>
-		Yoruba = 0x6F79,  // "yo"
-	}
+                /// <summary>Yoruba</summary>
+                Yoruba = 0x6F79,  // "yo"
+                /// <summary>Cantonese</summary>
+                Cantonese = 0x657579,  // "yue"
+        }
 }
