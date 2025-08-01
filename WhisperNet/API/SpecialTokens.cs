@@ -11,10 +11,12 @@
 		public readonly int PreviousWord;   // token_prev
 		/// <summary>Start of a sentence</summary>
 		public readonly int SentenceStart;   // token_solm
-		/// <summary>Represents the word "not" in the transcription</summary>
-		public readonly int Not;    // token_not
-		/// <summary>New transcription</summary>
-		public readonly int TranscriptionBegin;    // token_beg
+                /// <summary>Represents the word "not" in the transcription</summary>
+                public readonly int Not;    // token_not
+                /// <summary>No-speech probability token</summary>
+                public readonly int NoSpeech;    // token_nosp
+                /// <summary>New transcription</summary>
+                public readonly int TranscriptionBegin;    // token_beg
 		/// <summary>token_translate</summary>
 		public readonly int TaskTranslate;
 		/// <summary>token_transcribe</summary>

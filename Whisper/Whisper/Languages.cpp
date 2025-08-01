@@ -35,8 +35,8 @@ namespace
 
 	public:
 
-		LanguageIDs() :
-			map( 103u, 0.75f, 0.25f, 2.25f, 99 )
+               LanguageIDs() :
+                       map( 103u, 0.75f, 0.25f, 2.25f, 100 )
 		{
 			for( const Lang& e : s_languageData )
 				map.SetAt( e.key, sLanguage{ e.id, e.name } );

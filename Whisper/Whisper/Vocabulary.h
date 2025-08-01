@@ -26,19 +26,25 @@ namespace Whisper
 
 		id token_eot = 50256;
 		id token_sot = 50257;
-		id token_prev = 50360;
-		id token_solm = 50361; // ??
-		id token_not = 50362; // no timestamps
-		id token_beg = 50363;
+                id token_prev = 50360;
+                id token_nosp = 50361; // no-speech probability token
+                id token_solm = 50359; // sentence start
+                id token_not  = 50362; // no timestamps
+                id token_beg  = 50363;
 
 		// available tasks
-		static const id token_translate = 50358;
-		static const id token_transcribe = 50359;
+               id token_translate  = 50357;
+               id token_transcribe = 50358;
 
-		bool is_multilingual() const
-		{
-			return n_vocab == 51865;
-		}
+                bool is_multilingual() const
+                {
+                        return n_vocab >= 51865;
+                }
+
+                int num_languages() const
+                {
+                        return n_vocab - 51765 - ( is_multilingual() ? 1 : 0 );
+                }
 
 		const char* string( int id ) const
 		{

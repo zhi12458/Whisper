@@ -107,15 +107,21 @@ HRESULT Vocabulary::load( ComLight::iReadStream* stm, int lengthInHeader )
 
 	n_vocab = lengthInHeader;
 
-	if( is_multilingual() )
-	{
-		token_eot++;
-		token_sot++;
-		token_prev++;
-		token_solm++;
-		token_not++;
-		token_beg++;
-	};
+        if( is_multilingual() )
+        {
+                token_eot++;
+                token_sot++;
+
+                int dt = num_languages() - 98;
+
+                token_translate  += dt;
+                token_transcribe += dt;
+                token_solm       += dt;
+                token_prev       += dt;
+                token_nosp       += dt;
+                token_not        += dt;
+                token_beg        += dt;
+        };
 
 	if( countWords < lengthInHeader )
 	{
@@ -127,10 +133,18 @@ HRESULT Vocabulary::load( ComLight::iReadStream* stm, int lengthInHeader )
 				tokens[ i ] = "[_EOT_]";
 			else if( i == token_sot )
 				tokens[ i ] = "[_SOT_]";
-			else if( i == token_prev )
-				tokens[ i ] = "[_PREV_]";
-			else if( i == token_not )
-				tokens[ i ] = "[_NOT_]";
+                        else if( i == token_translate )
+                                tokens[ i ] = "[_TRANSLATE_]";
+                        else if( i == token_transcribe )
+                                tokens[ i ] = "[_TRANSCRIBE_]";
+                        else if( i == token_solm )
+                                tokens[ i ] = "[_SOLM_]";
+                        else if( i == token_prev )
+                                tokens[ i ] = "[_PREV_]";
+                        else if( i == token_nosp )
+                                tokens[ i ] = "[_NOSP_]";
+                        else if( i == token_not )
+                                tokens[ i ] = "[_NOT_]";
 			else if( i == token_beg )
 				tokens[ i ] = "[_BEG_]";
 			else
@@ -146,12 +160,13 @@ void Vocabulary::getSpecialTokens( SpecialTokens& rdi ) const
 {
 	rdi.TranscriptionEnd = token_eot;
 	rdi.TranscriptionStart = token_sot;
-	rdi.PreviousWord = token_prev;
-	rdi.SentenceStart = token_solm;
-	rdi.Not = token_not;
-	rdi.TranscriptionBegin = token_beg;
-	rdi.TaskTranslate = token_translate;
-	rdi.TaskTranscribe = token_transcribe;
+        rdi.PreviousWord = token_prev;
+        rdi.SentenceStart = token_solm;
+        rdi.Not = token_not;
+        rdi.NoSpeech = token_nosp;
+        rdi.TranscriptionBegin = token_beg;
+        rdi.TaskTranslate = token_translate;
+        rdi.TaskTranscribe = token_transcribe;
 }
 
 // https://github.com/ggerganov/whisper.cpp/blob/v1.2.1/whisper.cpp#L2451
